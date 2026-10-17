@@ -1,12 +1,14 @@
 // ==UserScript==
 // @name         Oskoua pour Kick
 // @namespace    https://kick.com/o-skouate
-// @version      1.0.1
+// @version      1.0.2
 // @description  Ajoute un bouton Oskoua dans le t'chat de kick.com/o-skouate pour lancer ses sketchs (!gifle, !boom, !danse…) et le faire parler (!tts) en un clic.
 // @author       Oskouate
 // @match        https://kick.com/o-skouate*
 // @match        https://kick.com/popout/o-skouate/chat*
 // @match        https://www.kick.com/o-skouate*
+// @updateURL    https://raw.githubusercontent.com/xklwxklw979/oskoua-kick/main/oskoua-kick.user.js
+// @downloadURL  https://raw.githubusercontent.com/xklwxklw979/oskoua-kick/main/oskoua-kick.user.js
 // @grant        none
 // @run-at       document-idle
 // ==/UserScript==
