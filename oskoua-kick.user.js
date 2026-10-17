@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Oskoua pour Kick
 // @namespace    https://kick.com/o-skouate
-// @version      1.0.2
+// @version      1.0.3
 // @description  Ajoute un bouton Oskoua dans le t'chat de kick.com/o-skouate pour lancer ses sketchs (!gifle, !boom, !danse…) et le faire parler (!tts) en un clic.
 // @author       Oskouate
 // @match        https://kick.com/o-skouate*
@@ -52,6 +52,11 @@
   .osk-t .cd{position:absolute;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:${ACC}}
   .osk-t.wait{cursor:not-allowed;border-color:#232823;transform:none}
   .osk-t.wait .cd{display:flex}
+  #osk-roul{display:block;width:100%;margin-top:10px;padding:9px;border-radius:10px;border:2px solid #ffd23c;background:#2a2410;color:#ffd23c;
+    font-weight:900;font-size:13.5px;cursor:pointer;transition:background .15s}
+  #osk-roul small{font-weight:600;opacity:.8}
+  #osk-roul:hover{background:#3a3214}
+  #osk-roul.confirm{background:#ffd23c;color:#0d0d0d}
   #osk-tts{display:flex;gap:6px;margin-top:10px}
   #osk-tts input{flex:1;min-width:0;background:#151915;border:2px solid #232823;border-radius:9px;color:#fff;padding:7px 9px;font-size:13px;font-weight:600;outline:none}
   #osk-tts input:focus{border-color:${ACC}}
@@ -133,6 +138,7 @@
   const panel = document.createElement('div'); panel.id = 'osk-panel';
   panel.innerHTML = `<h3>${FACE}OSKOUA</h3><div class="sub">Clique pour faire réagir Oskoua sur le live</div>
     <div id="osk-grid">${SKETCHS.map(([c, e, n]) => `<div class="osk-t" data-c="${c}" title="!${c}"><span class="e">${e}</span>${n}<span class="cd"></span></div>`).join('')}</div>
+    <button id="osk-roul" type="button">🎰 Acheter une roulette <small>(2000 pts Kicklet)</small></button>
     <div id="osk-tts"><input maxlength="150" placeholder="Fais parler Oskoua (!tts)…"><button>🗣️ Dire</button></div>
     <div class="osk-opt"><label><input type="checkbox" id="osk-send"> envoyer directement</label><span>Oskouate 💚</span></div>`;
   document.body.appendChild(panel);
@@ -144,6 +150,17 @@
     if (now - (last[c] || 0) < COOLDOWN * 1000) return;
     if (await sendToChat('!' + c)) { last[c] = now; tickCd(); }
   });
+  // roulette Kicklet : un 1er clic demande confirmation (ça coûte des points), le 2e envoie
+  const roul = panel.querySelector('#osk-roul'); let roulT = 0;
+  roul.onclick = async () => {
+    if (!roul.classList.contains('confirm')) {
+      roul.classList.add('confirm'); roul.innerHTML = '🎰 Sûr ? Clique encore pour acheter';
+      clearTimeout(roulT); roulT = setTimeout(() => { roul.classList.remove('confirm'); roul.innerHTML = '🎰 Acheter une roulette <small>(2000 pts Kicklet)</small>'; }, 3500);
+      return;
+    }
+    clearTimeout(roulT); roul.classList.remove('confirm'); roul.innerHTML = '🎰 Acheter une roulette <small>(2000 pts Kicklet)</small>';
+    if (await sendToChat('!shop buy roulette')) toast('🎰 Roulette demandée !');
+  };
   const ttsIn = panel.querySelector('#osk-tts input');
   const sayTts = async () => { const t = ttsIn.value.trim(); if (!t) return; if (await sendToChat('!tts ' + t)) ttsIn.value = ''; };
   panel.querySelector('#osk-tts button').onclick = sayTts;
